@@ -68,16 +68,25 @@ export domain_boundaries="-179.75,179.75,-89.75,-55.25"
  export DESTMASK="/oceano/gmeteo/WORK/PROYECTOS/2018_IPCC/INTERPOLATION/prueba_yo/WRKDIR/land_sea_mask_05degree.nc4"									
 
 #Define the variables to interpolate
- export variables=( "spi6" )
+ export variables=( "spi6" "spi12" "pr" "tas" )
 
 #Loop over variables - each file conatins one variable
 for var in "${variables[@]}"; do 
- export varname="SPI-6"
- export WRKDIR=/oceano/gmeteo/WORK/PROYECTOS/2018_IPCC/INTERPOLATION/prueba_yo/WRKDIR/$domain_name/
- export INPUT=/oceano/gmeteo/WORK/PROYECTOS/2018_IPCC/data/CORDEX/$domain_name/${var}/
- export OUTPUT=/oceano/gmeteo/WORK/PROYECTOS/2018_IPCC/INTERPOLATION/prueba_yo/WRKDIR/$domain_name/output/test/${var}/						
- export INMASKS=/oceano/gmeteo/WORK/PROYECTOS/2018_IPCC/data/CORDEX/$domain_name/mask/sftlf/		 
- export ORIG_INPUT=/oceano/gmeteo/WORK/PROYECTOS/2018_IPCC/data/CORDEX/$domain_name/pr/	# location of the original files that conatin info on the source grid. Necessary to define if the input files are 
+  if [ $var == "spi6" ]; then
+    export varname="SPI-6"
+    echo "varname=$varname"
+  elif [ $var == "spi12" ]; then 
+    export varname="SPI-12"
+    echo "varname=$varname"
+  else
+    export varname=$var
+    echo "varname=$varname"
+  fi
+  export WRKDIR="<path to a working directory>"
+  export INPUT="<full path to directory with files to be interpolated>"  
+  export OUTPUT="<full path to the location where the interpolated files will be written>" 						
+  export INMASKS="<full path of the location with masks for the source RCMs>"	 
+  export ORIG_INPUT="<full path of the location where non-processed files are located, directly form ESGF>" # necessary for the files lacking grid info, e.g. for RegCM4 
 	
  if ! [ -d $OUTPUT ]; then
   mkdir -p $OUTPUT
@@ -278,14 +287,17 @@ fi
 #================================================================
  
     mv final.nc ${OUTPUT}/${newfilename}	    			#Renaming the file and moving the file to the output folder
-    rename ${domain_name} ${domain_name}i ${OUTPUT}/${newfilename} 	#Renaming all the files - adding i to the ${domain_name}
  done 							 		#End of the loop over files 
     rm *.nc source.grid 						#Deleting all the files related to a specific model
  done 							  		#End of the loop over models
     rm models filelist.txt			        		#Removing the model list and filelist, for creating a new one for the new variable
     mv models ${var}_models
+    cd $OUTPUT
+    rename ${domain_name} ${domain_name}i *.nc4			 	#Renaming all the files - adding i to the ${domain_name}
+    echo "Interpolation of ${var} completed succefully*"
+    cd $WRKDIR
  done 							  		#End of the loop over variables 
-
+    echo "**************INTERPOLATION COMPLETED SUCCESSFULLY*******************"
 
 
 
