@@ -1,4 +1,4 @@
-# Interpolation_ATLAS
+# Interpolation ATLAS
 Scripts used for the conservative interpolation of the CORDEX files done for ATLAS
 
 All the raw model outputs used in ATLAS from the CMIP5, CMIP6 and CODEX experiments have been interpolated to a common grid using the fist order conservative remapping with cdo (https://code.mpimet.mpg.de/projects/cdo/) .
